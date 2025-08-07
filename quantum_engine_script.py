@@ -1,10 +1,8 @@
-# quantum_engine_script.py (Versi Otak Ahli Strategi)
+# quantum_engine_script.py (Versi Jenderal Bijaksana - FINAL)
 
 import os
-import numpy as np
 from supabase import create_client, Client
 
-# ... (Bagian pengambilan kredensial Supabase tetap sama) ...
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 if not SUPABASE_URL or not SUPABASE_KEY:
@@ -14,72 +12,64 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def strategic_decision_engine(beliefs):
     """
-    Ini adalah Otak Kuantum yang sebenarnya. Ia membaca laporan intelijen
-    dan membuat keputusan strategis berdasarkan kondisi kerajaan.
+    Versi ini jauh lebih tangguh dan tidak akan crash jika format data berbeda.
     """
-    print(f"🧠 Menganalisis Laporan Intelijen: {beliefs}")
+    print(f"🧠 Menganalisis Laporan Intelijen Baru: {beliefs}")
 
-    # --- FASE 1: PENILAIAN KONDISI KERAJAAN ---
+    # --- FASE 1: PENILAIAN INTELIJEN SECARA HATI-HATI ---
     
-    # Cek Kesehatan Sistem (System Health)
-    # Jika 'system_health' ada dan statusnya bukan 'unreachable' atau 'error'
-    system_health_ok = 'system_health' in beliefs and beliefs['system_health'].get('status') == 'operational'
+    # --- PERUBAHAN KUNCI ---
+    # Kita gunakan .get() berlapis untuk keamanan maksimal
+    system_health_ok = beliefs.get("system_health", {}).get("status") == "operational"
     
-    # Cek Aktivitas Pengguna (User Activity)
-    # Jika 'user_activity' ada dan tidak error
-    user_activity_ok = 'user_activity' in beliefs and beliefs['user_activity'].get('status') != 'unreachable'
-    
-    # Contoh pengambilan data nyata dari belief (jika API sudah berjalan)
-    active_users = beliefs.get('user_activity', {}).get('active_users_today', 0)
+    # Untuk aktivitas pengguna, kita anggap OK jika ada data 'active_users_today'
+    user_activity_ok = "active_users_today" in beliefs.get("user_activity", {})
+    active_users = beliefs.get("user_activity", {}).get("active_users_today", 0)
 
-    # Cek Aktivitas Pengembangan (GitHub Activity)
-    development_activity_ok = 'github_activity' in beliefs and beliefs['github_activity'].get('status') != 'error'
+    # Untuk aktivitas dev, kita periksa status error
+    development_activity_ok = beliefs.get("github_activity", {}).get("status") != "error"
 
-    print(f"   -> Penilaian: Kesehatan Sistem OK? {system_health_ok}, Aktivitas Pengguna OK? {user_activity_ok}, Aktivitas Dev OK? {development_activity_ok}")
-    print(f"   -> Jumlah Pengguna Aktif: {active_users}")
+    print(f"   -> Penilaian: Kesehatan OK? {system_health_ok}, Aktivitas Pengguna OK? {user_activity_ok}, Aktivitas Dev OK? {development_activity_ok}")
+    print(f"   -> Data Pengguna Aktif: {active_users}")
 
     # --- FASE 2: PENGAMBILAN KEPUTUSAN STRATEGIS ---
     
-    # PRIORITAS #1: Jika sistem tidak sehat, PERBAIKI DULU!
+    # PRIORITAS #1: Jika kesehatan sistem TIDAK OK, SEMBUHKAN!
     if not system_health_ok:
-        print("   -> KEPUTUSAN: Kesehatan sistem kritis! Fokus pada perbaikan.")
+        print("   -> KEPUTUSAN: Kesehatan sistem adalah prioritas utama! Fokus pada perbaikan.")
         return {"next_action": "initiate_self_healing_protocol"}
 
-    # PRIORITAS #2: Jika sistem sehat tapi aktivitas pengguna rendah (misal < 1000)
+    # PRIORITAS #2: Jika sistem sehat tapi aktivitas pengguna rendah
     if system_health_ok and active_users < 1000:
-        print("   -> KEPUTUSAN: Sistem sehat tapi sepi. Fokus pada pertumbuhan pengguna.")
+        print("   -> KEPUTUSAN: Kerajaan aman tapi sepi. Fokus pada kampanye pertumbuhan.")
         return {"next_action": "launch_user_acquisition_campaign"}
 
-    # PRIORITAS #3: Jika semua sehat dan pengguna aktif, SAATNYA INOVASI!
+    # PRIORITAS #3: Jika semua sehat dan ramai, SAATNYA INOVASI!
     if system_health_ok and active_users >= 1000 and development_activity_ok:
-        print("   -> KEPUTUSAN: Semua stabil. Waktunya untuk inovasi dan fitur baru.")
+        print("   -> KEPUTUSAN: Kerajaan makmur! Waktunya untuk fitur baru dan ekspansi.")
         return {"next_action": "deploy_new_experimental_feature"}
 
-    # KONDISI DEFAULT: Jika tidak ada yang cocok, lakukan optimisasi.
-    print("   -> KEPUTUSAN: Kondisi stabil. Lakukan optimisasi rutin.")
+    # KONDISI DEFAULT: Jika kerajaan aman dan ramai, tapi dev tidak aktif, lakukan optimisasi.
+    print("   -> KEPUTUSAN: Kondisi stabil. Lakukan optimisasi dan pemeliharaan rutin.")
     return {"next_action": "stabilize_and_optimize_core_systems"}
 
 
 def process_pending_tasks():
-    # ... (Kode ini tidak perlu diubah sama sekali, karena ia hanya memanggil 'strategic_decision_engine') ...
-    # ... ia akan mengambil tugas 'pending' dan memanggil fungsi di atas ...
+    # ... (Kode di bawah ini tidak perlu diubah sama sekali) ...
     print("⚡ Memeriksa tugas baru di Supabase...")
     try:
         response = supabase.table('quantum_tasks').select('*').eq('status', 'pending').execute()
         if not response.data:
             print("...Tidak ada tugas 'pending' yang ditemukan. Selesai.")
             return
-
         for task in response.data:
             print(f"🔥 Mengerjakan tugas ID: {task['id']}...")
             try:
                 result = {}
                 if task.get('task_type') == 'optimize_desires':
-                    # Panggil OTAK STRATEGIS kita yang baru
                     result = strategic_decision_engine(task['payload'])
                 else:
                     result = {"next_action": "unknown_task_type_received"}
-
                 supabase.table('quantum_tasks').update({'status': 'completed', 'result': result}).eq('id', task['id']).execute()
                 print(f"✅ Tugas ID: {task['id']} selesai. Keputusan: {result.get('next_action')}")
             except Exception as e:
