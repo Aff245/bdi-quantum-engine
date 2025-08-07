@@ -1,61 +1,68 @@
-# quantum_engine_script.py (Versi Startup-Grade - LENGKAP)
+# quantum_engine_script.py (Versi Otak Ahli Strategi)
 
 import os
 import numpy as np
 from supabase import create_client, Client
 
-# Ambil kredensial dari GitHub Secrets
+# ... (Bagian pengambilan kredensial Supabase tetap sama) ...
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-
-# Pastikan kredensial ada sebelum membuat koneksi
 if not SUPABASE_URL or not SUPABASE_KEY:
-    print("❌ Error: Kredensial Supabase tidak ditemukan di GitHub Secrets.")
-    exit(1) # Keluar dari skrip jika tidak ada kredensial
-
+    print("❌ Error: Kredensial Supabase tidak ditemukan.")
+    exit(1)
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-def quantum_inspired_decision(beliefs):
+def strategic_decision_engine(beliefs):
     """
-    Fungsi ini mensimulasikan proses 'pemikiran' yang lebih kompleks
-    daripada if-else sederhana, terinspirasi dari komputasi kuantum.
+    Ini adalah Otak Kuantum yang sebenarnya. Ia membaca laporan intelijen
+    dan membuat keputusan strategis berdasarkan kondisi kerajaan.
     """
-    print(f"🧠 Menganalisis beliefs secara holistik: {beliefs}")
+    print(f"🧠 Menganalisis Laporan Intelijen: {beliefs}")
+
+    # --- FASE 1: PENILAIAN KONDISI KERAJAAN ---
     
-    # 1. Konversi beliefs menjadi vektor numerik (Encoding)
-    # Ini mensimulasikan bagaimana data di-encode ke dalam qubit.
-    # Kita normalisasi data agar nilainya antara 0 dan 1.
-    feature_vector = np.array([
-        beliefs.get('github_torvalds_followers', 0) / 500000.0, # Normalisasi (asumsi maks 500k followers)
-        beliefs.get('bitcoin_price_usd', 0) / 100000.0, # Normalisasi (asumsi maks harga $100k)
-        np.random.rand() # Menambahkan elemen 'noise' atau ketidakpastian kuantum
-    ])
+    # Cek Kesehatan Sistem (System Health)
+    # Jika 'system_health' ada dan statusnya bukan 'unreachable' atau 'error'
+    system_health_ok = 'system_health' in beliefs and beliefs['system_health'].get('status') not in ['unreachable', 'error']
     
-    # 2. Terapkan 'Quantum Transformation' (Simulasi)
-    # Kita gunakan fungsi matematika non-linear (seperti tanh) untuk 
-    # mensimulasikan kompleksitas transformasi dalam sirkuit kuantum.
-    # Bobot ini bisa dilatih dengan ML di masa depan.
-    weights = np.array([0.8, 1.2, -0.5])
-    transformed_vector = np.tanh(np.dot(feature_vector, weights))
+    # Cek Aktivitas Pengguna (User Activity)
+    # Jika 'user_activity' ada dan tidak error
+    user_activity_ok = 'user_activity' in beliefs and beliefs['user_activity'].get('status') not in ['unreachable', 'error']
+
+    # Cek Aktivitas Pengembangan (GitHub Activity)
+    # Jika 'github_activity' tidak error (misalnya tidak 404)
+    development_activity_ok = 'github_activity' in beliefs and beliefs['github_activity'].get('status') != 'error'
+
+    print(f"   -> Penilaian: Kesehatan Sistem OK? {system_health_ok}, Aktivitas Pengguna OK? {user_activity_ok}, Aktivitas Dev OK? {development_activity_ok}")
+
+    # --- FASE 2: PENGAMBILAN KEPUTUSAN STRATEGIS ---
     
-    # 3. 'Measurement' untuk membuat keputusan
-    # Kita ambil keputusan berdasarkan hasil transformasi.
-    decision_score = transformed_vector
-    print(f"   (Quantum) Skor Keputusan: {decision_score:.4f}")
-    
-    # Logika keputusan berdasarkan skor
-    if decision_score > 0.3:
-        # Jika skor positif dan kuat, fokus pada pertumbuhan
-        return {"next_action": "focus_on_growth_and_innovation", "score": decision_score}
-    else:
-        # Jika tidak, fokus pada stabilitas
-        return {"next_action": "stabilize_and_optimize_core_systems", "score": decision_score}
+    # PRIORITAS #1: Jika sistem tidak sehat, PERBAIKI DULU!
+    if not system_health_ok:
+        print("   -> KEPUTUSAN: Kesehatan sistem kritis! Fokus pada perbaikan.")
+        return {"next_action": "initiate_self_healing_protocol"}
+
+    # PRIORITAS #2: Jika sistem sehat tapi tidak ada aktivitas pengguna, CARI PENGGUNA!
+    if system_health_ok and not user_activity_ok:
+        print("   -> KEPUTUSAN: Sistem sehat tapi sepi. Fokus pada pertumbuhan.")
+        return {"next_action": "launch_user_acquisition_campaign"}
+
+    # PRIORITAS #3: Jika semua sehat, SAATNYA INOVASI!
+    if system_health_ok and user_activity_ok and development_activity_ok:
+        print("   -> KEPUTUSAN: Semua stabil. Waktunya untuk inovasi dan fitur baru.")
+        return {"next_action": "deploy_new_experimental_feature"}
+
+    # KONDISI DEFAULT: Jika tidak ada yang cocok, lakukan optimisasi.
+    print("   -> KEPUTUSAN: Kondisi stabil. Lakukan optimisasi rutin.")
+    return {"next_action": "stabilize_and_optimize_core_systems"}
+
 
 def process_pending_tasks():
+    # ... (Kode ini tidak perlu diubah sama sekali, karena ia hanya memanggil 'strategic_decision_engine') ...
+    # ... ia akan mengambil tugas 'pending' dan memanggil fungsi di atas ...
     print("⚡ Memeriksa tugas baru di Supabase...")
     try:
         response = supabase.table('quantum_tasks').select('*').eq('status', 'pending').execute()
-        
         if not response.data:
             print("...Tidak ada tugas 'pending' yang ditemukan. Selesai.")
             return
@@ -65,24 +72,16 @@ def process_pending_tasks():
             try:
                 result = {}
                 if task.get('task_type') == 'optimize_desires':
-                    # Panggil fungsi kuantum kita yang baru
-                    result = quantum_inspired_decision(task['payload'])
+                    # Panggil OTAK STRATEGIS kita yang baru
+                    result = strategic_decision_engine(task['payload'])
                 else:
                     result = {"next_action": "unknown_task_type_received"}
 
-                # Update tugas dengan hasil
-                supabase.table('quantum_tasks').update({
-                    'status': 'completed', 
-                    'result': result
-                }).eq('id', task['id']).execute()
+                supabase.table('quantum_tasks').update({'status': 'completed', 'result': result}).eq('id', task['id']).execute()
                 print(f"✅ Tugas ID: {task['id']} selesai. Keputusan: {result.get('next_action')}")
             except Exception as e:
                 print(f"❌ Error saat memproses tugas ID {task['id']}: {e}")
-                supabase.table('quantum_tasks').update({
-                    'status': 'failed', 
-                    'result': {'error': str(e)}
-                }).eq('id', task['id']).execute()
-
+                supabase.table('quantum_tasks').update({'status': 'failed', 'result': {'error': str(e)}}).eq('id', task['id']).execute()
     except Exception as e:
         print(f"❌ Gagal terhubung atau mengambil data dari Supabase: {e}")
 
