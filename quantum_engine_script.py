@@ -23,17 +23,20 @@ def strategic_decision_engine(beliefs):
     
     # Cek Kesehatan Sistem (System Health)
     # Jika 'system_health' ada dan statusnya bukan 'unreachable' atau 'error'
-    system_health_ok = 'system_health' in beliefs and beliefs['system_health'].get('status') not in ['unreachable', 'error']
+    system_health_ok = 'system_health' in beliefs and beliefs['system_health'].get('status') == 'operational'
     
     # Cek Aktivitas Pengguna (User Activity)
     # Jika 'user_activity' ada dan tidak error
-    user_activity_ok = 'user_activity' in beliefs and beliefs['user_activity'].get('status') not in ['unreachable', 'error']
+    user_activity_ok = 'user_activity' in beliefs and beliefs['user_activity'].get('status') != 'unreachable'
+    
+    # Contoh pengambilan data nyata dari belief (jika API sudah berjalan)
+    active_users = beliefs.get('user_activity', {}).get('active_users_today', 0)
 
     # Cek Aktivitas Pengembangan (GitHub Activity)
-    # Jika 'github_activity' tidak error (misalnya tidak 404)
     development_activity_ok = 'github_activity' in beliefs and beliefs['github_activity'].get('status') != 'error'
 
     print(f"   -> Penilaian: Kesehatan Sistem OK? {system_health_ok}, Aktivitas Pengguna OK? {user_activity_ok}, Aktivitas Dev OK? {development_activity_ok}")
+    print(f"   -> Jumlah Pengguna Aktif: {active_users}")
 
     # --- FASE 2: PENGAMBILAN KEPUTUSAN STRATEGIS ---
     
@@ -42,13 +45,13 @@ def strategic_decision_engine(beliefs):
         print("   -> KEPUTUSAN: Kesehatan sistem kritis! Fokus pada perbaikan.")
         return {"next_action": "initiate_self_healing_protocol"}
 
-    # PRIORITAS #2: Jika sistem sehat tapi tidak ada aktivitas pengguna, CARI PENGGUNA!
-    if system_health_ok and not user_activity_ok:
-        print("   -> KEPUTUSAN: Sistem sehat tapi sepi. Fokus pada pertumbuhan.")
+    # PRIORITAS #2: Jika sistem sehat tapi aktivitas pengguna rendah (misal < 1000)
+    if system_health_ok and active_users < 1000:
+        print("   -> KEPUTUSAN: Sistem sehat tapi sepi. Fokus pada pertumbuhan pengguna.")
         return {"next_action": "launch_user_acquisition_campaign"}
 
-    # PRIORITAS #3: Jika semua sehat, SAATNYA INOVASI!
-    if system_health_ok and user_activity_ok and development_activity_ok:
+    # PRIORITAS #3: Jika semua sehat dan pengguna aktif, SAATNYA INOVASI!
+    if system_health_ok and active_users >= 1000 and development_activity_ok:
         print("   -> KEPUTUSAN: Semua stabil. Waktunya untuk inovasi dan fitur baru.")
         return {"next_action": "deploy_new_experimental_feature"}
 
