@@ -3,7 +3,7 @@ name: BDI Quantum Engine Worker
 on:
   schedule:
     # KUNCI UTAMA: "Bangun" setiap 5 menit sekali, setiap saat.
-    - cron: '*/5 * * * *'
+    - cron: '*/15 * * * *'
   workflow_dispatch: # Agar bisa dipicu manual juga
 
 jobs:
