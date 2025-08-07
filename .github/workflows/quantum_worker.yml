@@ -1,0 +1,35 @@
+name: BDI Quantum Engine Worker
+
+on:
+  schedule:
+    # KUNCI UTAMA: "Bangun" setiap 5 menit sekali, setiap saat.
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # Agar bisa dipicu manual juga
+
+jobs:
+  process-quantum-tasks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4 # Agar tidak boros waktu jika ada masalah
+
+    steps:
+      - name: Checkout Repositori
+        uses: actions/checkout@v3
+
+      - name: Setup Lingkungan Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Semua Dependensi
+        run: |
+          pip install supabase numpy schedule requests
+          # Kita tidak perlu install library kuantum jika hanya simulasi
+          # Jika butuh, tambahkan: pip install pennylane tensorflow-quantum
+
+      - name: Jalankan Skrip Mesin Kuantum
+        # Skrip ini akan memeriksa Supabase, bekerja, dan update hasil.
+        run: python quantum_engine_script.py
+        env:
+          # KUNCI KEDUA: Simpan rahasia Anda di GitHub Secrets
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
